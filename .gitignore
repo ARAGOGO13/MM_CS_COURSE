@@ -1,0 +1,12 @@
+# IDE
+.idea/
+
+# OS
+.DS_Store
+
+# Build artifacts
+*.o
+*.obj
+a.out
+*.exe
+*.out
