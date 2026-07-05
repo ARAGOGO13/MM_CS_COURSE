@@ -9,7 +9,7 @@ all: a01.out a02.out a03.out a04.out a05.out a06.out a07.out a08.out a09.out a10
 a%.out: main_%.o solve.o array_io.o
 	gcc $(CFLAGS) $^ -o $@
 
-main_%.o: main_%.c solve.h arrai_io.h
+main_%.o: main_%.c solve.h array_io.h
 	gcc -c $< $(CFLAGS) -o $@
 
 solve.o: solve.c solve.h
