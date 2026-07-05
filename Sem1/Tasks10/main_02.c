@@ -1,45 +1,37 @@
 #include <stdio.h>
-#include <time.h>
+#include <string.h>
+#include <stdlib.h>
+#include "test.h"
 #include "solve.h"
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
-	char *filename_a = 0;
-	char *filename_b = 0;
-	char *str = 0;
-	int result = 0;
-	double t = 0;
-
-	if (!(argc == 4)) 
+	ssize_t count;
+	double t;
+	char *s1;
+	const char *s2;
+	char *res = 0;
+	if (argc != 3 || sscanf(argv[1], "%zd", &count) != 1)
 		{
-			printf("Usage: %s filename_a filename_b s", argv[0]);
-			return -1;
+			printf("Usage: %s n str", argv[0]);
+			return 1;
 		}
 
-	filename_a = argv[1];
-	filename_b = argv[2];
-	str = argv[3];
-
-	t = clock();
-	result = task02(filename_a, filename_b, str);
-	if (result < 0)
-		{	
-			switch (result) 
-	      	{
-		        case ERROR_OPEN:
-		          printf("Error: Can not read from %s \n", filename_a);
-		          break;
-		        case ERROR_READ:
-		          printf("Error: reading the file %s \n", filename_a);
-		          break;
-		        default:
-		          printf("Unknown error\n");
-		          break;
-	      	}
-	    	return 3;
+	s2 = argv[2];
+	s1 = (char *)malloc((strlen_(s2) + 1) * sizeof(char));
+	if (!s1)
+		{
+			printf("Not enough memory \n");
+			return 2;
 		}
-	t = (clock() - t) / CLOCKS_PER_SEC;
+	s1[0] = 0;
 
-	printf ("%s : Task = %d Result = %d Elapsed = %.2f\n", argv[0], 2, result, t);
+	t = test_2_5(count, &strcpy_, s1, s2, &res);
+	printf("%s : Task = %d Res = %s Elapsed = %.2f\n", argv[0], 2, res, t);
+
+	t = test_2_5(count, &strcpy, s1, s2, &res);
+	printf("%s : Task = %d Res_std = %s Elapsed = %.2f\n", argv[0], 2, res, t);
+
+	free(s1);
 	return 0;
 }

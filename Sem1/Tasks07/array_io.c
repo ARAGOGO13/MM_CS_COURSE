@@ -66,6 +66,6 @@ void print_array(const double *a, int n, int p)
 	int i;
 	for (i = 0; i < p && i < n; i++)
 		{	
-			printf("%e\n", a[i]);
+			printf("%lf\n", a[i]);
 		}
 }

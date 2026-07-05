@@ -8,17 +8,16 @@
 
 int main(int argc, char *argv[])
 {
-	int n, m, pa, pb, sa, sb, diff, cmp;
+	int n, m, pa, pb, sa, sb, diff;
 	char *file_name_b = 0;
 	char *file_name_a = 0;
 	double *a, *b, *c;
 	double t;
-	int (*cmp_func)(double, double);
 	int res;
-	if (!((8 <= argc && argc <= 10) && sscanf(argv[1], "%d", &cmp) == 1 && sscanf(argv[2], "%d", &n) == 1 && 
-		sscanf(argv[3], "%d", &pa) == 1 && sscanf(argv[4], "%d", &sa) == 1))
+	if (!((7 <= argc && argc <= 9) && sscanf(argv[1], "%d", &n) == 1 && 
+		sscanf(argv[2], "%d", &pa) == 1 && sscanf(argv[3], "%d", &sa) == 1))
 		{	
-			printf("Usage: %s c n p s [file] \n", argv[0]);
+			printf("Usage: %s n p s [file] \n", argv[0]);
 			return 1;
 		}
 
@@ -28,28 +27,28 @@ int main(int argc, char *argv[])
 			return 2;
 		}
 
-	if (sscanf(argv[5], "%d", &m) != 1)
+	if (sscanf(argv[4], "%d", &m) != 1)
 		{
-			file_name_a = argv[5];
-			if (!(sscanf(argv[6], "%d", &m) == 1 && 
-				sscanf(argv[7], "%d", &pb) == 1 && 
-				sscanf(argv[8], "%d", &sb) == 1))
-				{
-					printf("Usage: %s n p s [file] \n", argv[0]);
-					return 1;
-				}
-			if (argc == 9) file_name_b = argv[9];
-		}
-
-	else 
-		{
-			if (!(sscanf(argv[6], "%d", &pb) == 1 && 
+			file_name_a = argv[4];
+			if (!(sscanf(argv[5], "%d", &m) == 1 && 
+				sscanf(argv[6], "%d", &pb) == 1 && 
 				sscanf(argv[7], "%d", &sb) == 1))
 				{
 					printf("Usage: %s n p s [file] \n", argv[0]);
 					return 1;
 				}
 			if (argc == 9) file_name_b = argv[8];
+		}
+
+	else 
+		{
+			if (!(sscanf(argv[5], "%d", &pb) == 1 && 
+				sscanf(argv[6], "%d", &sb) == 1))
+				{
+					printf("Usage: %s n p s [file] \n", argv[0]);
+					return 1;
+				}
+			if (argc == 8) file_name_b = argv[7];
 		}
 	if (pb > m)
 		{	
@@ -132,21 +131,13 @@ int main(int argc, char *argv[])
 	printf("Array B:\n");
 	print_array(b, m, pb);
 
-	if (cmp == 1) cmp_func = compare1;
-	else if (cmp == 2) cmp_func = compare2;
-	else
-		{	
-			printf("Invalid value for c. Must be 1 or 2 \n");
-			return 1;
-		}
-
 	t = clock();
-	merge_arrays(a, b, c, n, m, cmp_func);
+	merge_arrays(a, b, c, n, m);
 	t = (clock() - t) / CLOCKS_PER_SEC;
 
 	printf("New array: \n");
 	print_array(c, n + m, pa + pb);
-	diff = diff_calculation(c, n + m, cmp_func);
+	diff = diff_calculation(c, n + m);
 
 	printf("%s : Task = %d Diff = %d Elapsed = %.2f\n", argv[0], 2, diff, t);
 	free(a);

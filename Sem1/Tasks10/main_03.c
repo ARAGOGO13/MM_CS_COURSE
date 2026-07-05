@@ -1,49 +1,32 @@
 #include <stdio.h>
-#include <time.h>
+#include <stdlib.h>
+#include <string.h>
+#include "test.h"
 #include "solve.h"
 
 int main(int argc, char *argv[])
 {
-	char *filename_a = 0;
-	char *filename_b = 0;
-	char *str = 0;
-	char *t_str = 0;
-	int result = 0;
-	double t = 0;
-
-	if (!(argc == 5)) 
+	ssize_t n;
+	char *s = 0;
+	int ch = 0;
+	char *res;
+	double t;
+	if (argc != 4 || sscanf(argv[1], "%zd", &n) != 1)
 		{
-			printf("Usage: %s filename_a filename_b s", argv[0]);
-			return -1;
+			printf("Usage %s n str ch \n", argv[0]);
+			return 1;
 		}
 
-	filename_a = argv[1];
-	filename_b = argv[2];
-	str = argv[3];
-	t_str = argv[4];
+	ch = (int) *argv[3];
+	s = argv[2];
 
-	t = clock();
-	result = task03(filename_a, filename_b, str, t_str);
-	if (result < 0)
-		{	
-			switch (result) 
-	      	{
-		        case ERROR_OPEN:
-		          printf("Error: Can not read from %s \n", filename_a);
-		          break;
-		        case ERROR_READ:
-		          printf("Error: reading the file %s \n", filename_a);
-		          break;
-		        case EMPTY_STRING:
-		          printf("Error: empty S the file %s \n", filename_a);
-		          break;
-		        default:
-		          printf("Unknown error\n");
-		          break;
-	      	}
-	    	return 3;
-		}	
-	t = (clock() - t) / CLOCKS_PER_SEC;
-	printf ("%s : Task = %d Result = %d Elapsed = %.2f\n", argv[0], 3, result, t);
+	t = test_3_4 (n, &strchr_, s, ch, &res);
+	if (res != 0) printf("%s : Task = %d Res = %s Elapsed = %.2f\n", argv[0], 3, res, t);
+	else printf("%s : Task = %d Res_std = Not found Elapsed = %.2f\n", argv[0], 3, t);
+
+	t = test_3_4 (n, &strchr, s, ch, &res);
+	if (res != 0) printf("%s : Task = %d Res_std = %s Elapsed = %.2f\n", argv[0], 3, res, t);
+	else printf("%s : Task = %d Res_std = Not found Elapsed = %.2f\n", argv[0], 3, t);
+
 	return 0;
 }

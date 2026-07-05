@@ -5,17 +5,16 @@
 #include "array_io.h"
 #include "solve.h"
 
-
 int main(int argc, char *argv[])
 {
 	int n, p, s;
 	char *file_name = 0;
 	double *a;
-	double t, x;
+	double t;
 	int res;
-	if (!((argc == 5 || argc == 6) && sscanf(argv[1], "%lf", &x) == 1 && sscanf(argv[2], "%d", &n) == 1 && sscanf(argv[3], "%d", &p) == 1 && sscanf(argv[4], "%d", &s) == 1))
+	if (!((argc == 4 || argc == 5) && sscanf(argv[1], "%d", &n) == 1 && sscanf(argv[2], "%d", &p) == 1 && sscanf(argv[3], "%d", &s) == 1))
 		{	
-			printf("Usage: %s x n p s [file] \n", argv[0]);
+			printf("Usage: %s n p s [file] \n", argv[0]);
 			return 1;
 		}
 
@@ -25,13 +24,13 @@ int main(int argc, char *argv[])
 			return 2;
 		}
 
-	if ((s == 0 && argc != 6) || (s != 0 && argc == 6))
+	if ((s == 0 && argc != 5) || (s != 0 && argc == 5))
 		{
 			printf("Need to set s = 0 or add file_name \n");
 			return 4;
 		}
 
-	if (argc == 6) file_name = argv[5];
+	if (argc == 5) file_name = argv[4];
 	a = (double*)malloc(n * sizeof(double));
 	if (!a)
 		{
@@ -60,20 +59,20 @@ int main(int argc, char *argv[])
 			        	break;
 			        default:
 			          printf("Unknown error\n");
-			          break;
+			           break;
 			      }
 			    free(a);
 			    return 3;
 				}
 		}
-	else init_array(a, n, s);
-	print_array(a, n, p);
-	t = clock();
-	res = dividing_array(a, n, x);
-	t = (clock() - t) / CLOCKS_PER_SEC;
-	printf("New array: \n");
-	print_array(a, n, p);
-	printf("%s : Task = %d Res = %d Elapsed = %.2f\n", argv[0], 3, res, t);
-	free(a);
-	return 0;
+		else init_array(a, n, s);
+		print_array(a, n, p);
+		t = clock();
+		res = filter_array3(a, n);
+		t = (clock() - t) / CLOCKS_PER_SEC;
+		printf("New array:\n");
+		print_array(a, res, p);
+		printf("%s : Task = %d Result = %d Elapsed = %.2f\n", argv[0], 3, res, t);
+		free(a);
+		return 0;
 }

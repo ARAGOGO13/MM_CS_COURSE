@@ -1,52 +1,30 @@
 #include <stdio.h>
-#include <time.h>
+#include <stdlib.h>
+#include <string.h>
+#include "test.h"
 #include "solve.h"
 
 int main(int argc, char *argv[])
 {
-	char *filename_a = 0;
-	char *filename_b = 0;
-	char *str = 0;
-	char *l_str = 0;
-	char *r_str = 0;
-	int result = 0;
-	double t = 0;
-
-	if (!(argc == 6)) 
+	ssize_t count;
+	size_t res;
+	double t;
+	const char *s1 = 0;
+	const char *s2 = 0;
+	if (argc != 4 || sscanf(argv[1], "%zd", &count) != 1)
 		{
-			printf("Usage: %s filename_a filename_b s", argv[0]);
-			return -1;
+			printf("Usage: %s n s1 s2", argv[0]);
+			return 1;
 		}
 
-	filename_a = argv[1];
-	filename_b = argv[2];
-	str = argv[3];
-	l_str = argv[4];
-	r_str = argv[5];
+	s1 = argv[2];
+	s2 = argv[3];
 
+	t = test_7_8(count, &strspn_, s1, s2, &res);
+	printf("%s : Task = %d Res = %zd Elapsed = %.2f\n", argv[0], 8, res, t);
 
-	t = clock();
-	result = task08(filename_a, filename_b, str, l_str, r_str);
-	if (result < 0)
-		{	
-			switch (result) 
-	      	{
-		        case ERROR_OPEN:
-		          printf("Error: Can not read from %s \n", filename_a);
-		          break;
-		        case ERROR_READ:
-		          printf("Error: reading the file %s \n", filename_a);
-		          break;
-		        case EMPTY_STRING:
-		          printf("Error: empty S the file %s \n", filename_a);
-		          break;
-		        default:
-		          printf("Unknown error\n");
-		          break;
-	      	}
-	    	return 3;
-		}	
-	t = (clock() - t) / CLOCKS_PER_SEC;
-	printf ("%s : Task = %d Result = %d Elapsed = %.2f\n", argv[0], 8, result, t);
+	t = test_7_8(count, &strspn, s1, s2, &res);
+	printf("%s : Task = %d Res_std = %zd Elapsed = %.2f\n", argv[0], 8, res, t);
+
 	return 0;
 }

@@ -2,49 +2,48 @@
 #include <time.h>
 #include "solve.h"
 
-int main (int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-	int task = 3;
-	io_status ret;
-	const char * f_in = 0;
-	const char * f_out = 0;
-	const char * s = 0;
-	const char * t = 0;
-	int res = 0;
-	double time;
+	char *filename_a = 0;
+	char *filename_b = 0;
+	char *str = 0;
+	char *t_str = 0;
+	int result = 0;
+	double t = 0;
 
-	if (argc != 5)
+	if (!(argc == 5)) 
 		{
-			printf("Usage: %s <f_in> <f_out> <s>\n", argv[0]);
-			return 1;
+			printf("Usage: %s filename_a filename_b s", argv[0]);
+			return -1;
 		}
 
-	f_in = argv[1];
-	f_out = argv[2];
-	s = argv[3];
-	t = argv[4];
-	time = clock();
-	ret = task03 (f_in, f_out, s, t, &res);
-	time = (clock() - time) / CLOCKS_PER_SEC;
+	filename_a = argv[1];
+	filename_b = argv[2];
+	str = argv[3];
+	t_str = argv[4];
 
-	switch (ret)
-		{
-			case SUCCESS:
-				printf ("%s : Task = %d Result = %d Elapsed = %.2f\n",
-				argv[0], task, res, time);
-				break;
-			case ERROR_OPEN:
-				printf ("Can not open %s\n", f_out);
-				return 1;
-			case ERROR_READ:
-				printf ("Can not read %s\n", f_out);
-				return 2;
-			case ERROR_PATTERN:
-				printf ("Error in pattern %s\n", s);
-				return 3;
-		}
-
+	t = clock();
+	result = task03(filename_a, filename_b, str, t_str);
+	if (result < 0)
+		{	
+			switch (result) 
+	      	{
+		        case ERROR_OPEN:
+		          printf("Error: Can not read from %s \n", filename_a);
+		          break;
+		        case ERROR_READ:
+		          printf("Error: reading the file %s \n", filename_a);
+		          break;
+		        case EMPTY_STRING:
+		          printf("Error: empty S the file %s \n", filename_a);
+		          break;
+		        default:
+		          printf("Unknown error\n");
+		          break;
+	      	}
+	    	return 3;
+		}	
+	t = (clock() - t) / CLOCKS_PER_SEC;
+	printf ("%s : Task = %d Result = %d Elapsed = %.2f\n", argv[0], 3, result, t);
 	return 0;
 }
-
-

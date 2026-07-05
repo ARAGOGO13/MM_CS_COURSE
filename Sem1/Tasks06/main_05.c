@@ -5,7 +5,6 @@
 #include "array_io.h"
 #include "solve.h"
 
-
 int main(int argc, char *argv[])
 {
 	int n, p, s, k;
@@ -69,11 +68,11 @@ int main(int argc, char *argv[])
 		else init_array(a, n, s);
 		print_array(a, n, p);
 		t = clock();
-		res = filter_array5(k, a, n);
+		res = right_shift_k(k, a, n);
 		t = (clock() - t) / CLOCKS_PER_SEC;
 		printf("New array:\n");		
-		print_array(a, res, p);
-		printf("%s : Task = %d Result = %d Elapsed = %.2f\n", argv[0], 5, res, t);
+		print_array(a, n, p);
+		printf("%s : Task = %d Elapsed = %.2f\n", argv[0], 5, t);
 		free(a);
 		return 0;
 }

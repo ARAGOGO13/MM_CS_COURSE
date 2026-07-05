@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 	if ((s == 0 && argc != 5) || (s != 0 && argc == 5))
 		{
 			printf("Need to set s = 0 or add file_name \n");
-			return 4;
+		  	return 4;
 		}
 
 	if (argc == 5) file_name = argv[4];
@@ -68,11 +68,11 @@ int main(int argc, char *argv[])
 		else init_array(a, n, s);
 		print_array(a, n, p);
 		t = clock();
-		res = filter_array2(a, n);
+		res = reverse_array(a, n);
 		t = (clock() - t) / CLOCKS_PER_SEC;
 		printf("New array:\n");
-		print_array(a, res, p);
-		printf("%s : Task = %d Result = %d Elapsed = %.2f\n", argv[0], 2, res, t);
+		print_array(a, n, p);
+		printf("%s : Task = %d Elapsed = %.2f\n", argv[0], 2, t);
 		free(a);
 		return 0;
 }

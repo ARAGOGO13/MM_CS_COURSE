@@ -1,9 +1,10 @@
-int binary_search(double *a, int n, double value, int type);
-
-int filter_array1(double *a, int n);
-int filter_array2(double *a, int n);
-int filter_array3(double *a, int n);
-int filter_array4(int k, double *a, int n);
-int filter_array5(int k, double *a, int n);
-int task6(char *file, double *a, int n);
-int task7(char *file, double *a, int n);
+int is_polyndrom (double *a, int n);
+int reverse_array (double *a, int n);
+int replace_with_means (double *a, int n);
+int right_shift (double *a, int n);
+int right_shift_k (int k, double *a, int n);
+int delete_small_elements (double x, double *a, int n);
+int num_of_identical (const char *file_b, double *a, int n);
+int num_of_occurrences(const char *file_b, double *a, int n);
+int connect_arrays(const double *a, const double *b, double *c, int n, int m);
+int delete_duplicates(double *a, double *b, int n, int m);

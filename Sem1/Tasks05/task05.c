@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
 
 	if (res >= 0) 
 		{ 
-    	printf("%s : Task = %d Result = %d i = %d j = %d \n", argv[0], 1, res, i, j);
+    	printf("%s : Task = %d Result = %d i = %d j = %d \n", argv[0], 5, res, i, j);
     } 
   else 
    	{

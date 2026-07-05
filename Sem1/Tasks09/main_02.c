@@ -1,37 +1,156 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-#include "test.h"
+#include <time.h>
+#include <math.h>
+#include "array_io.c"
+#include "array_io.h"
 #include "solve.h"
 
-int main(int argc, const char *argv[])
+int main(int argc, char *argv[])
 {
-	ssize_t count;
+	int n, m, pa, pb, sa, sb, diff, cmp;
+	char *file_name_b = 0;
+	char *file_name_a = 0;
+	double *a, *b, *c;
 	double t;
-	char *s1;
-	const char *s2;
-	char *res = 0;
-	if (argc != 3 || sscanf(argv[1], "%zd", &count) != 1)
-		{
-			printf("Usage: %s n str", argv[0]);
+	int (*cmp_func)(double, double);
+	int res;
+	if (!((8 <= argc && argc <= 10) && sscanf(argv[1], "%d", &cmp) == 1 && sscanf(argv[2], "%d", &n) == 1 && 
+		sscanf(argv[3], "%d", &pa) == 1 && sscanf(argv[4], "%d", &sa) == 1))
+		{	
+			printf("Usage: %s c n p s [file] \n", argv[0]);
 			return 1;
 		}
 
-	s2 = argv[2];
-	s1 = (char *)malloc((strlen_(s2) + 1) * sizeof(char));
-	if (!s1)
-		{
-			printf("Not enough memory \n");
+	if (pa > n)
+		{	
+			printf("Error: %d numbers cannot be output from an array of length %d \n", pa, n);
 			return 2;
 		}
-	s1[0] = 0;
 
-	t = test_2_5(count, &strcpy_, s1, s2, &res);
-	printf("%s : Task = %d Res = %s Elapsed = %.2f\n", argv[0], 2, res, t);
+	if (sscanf(argv[5], "%d", &m) != 1)
+		{
+			file_name_a = argv[5];
+			if (!(sscanf(argv[6], "%d", &m) == 1 && 
+				sscanf(argv[7], "%d", &pb) == 1 && 
+				sscanf(argv[8], "%d", &sb) == 1))
+				{
+					printf("Usage: %s n p s [file] \n", argv[0]);
+					return 1;
+				}
+			if (argc == 9) file_name_b = argv[9];
+		}
 
-	t = test_2_5(count, &strcpy, s1, s2, &res);
-	printf("%s : Task = %d Res_std = %s Elapsed = %.2f\n", argv[0], 2, res, t);
+	else 
+		{
+			if (!(sscanf(argv[6], "%d", &pb) == 1 && 
+				sscanf(argv[7], "%d", &sb) == 1))
+				{
+					printf("Usage: %s n p s [file] \n", argv[0]);
+					return 1;
+				}
+			if (argc == 9) file_name_b = argv[8];
+		}
+	if (pb > m)
+		{	
+			printf("Error: %d numbers cannot be output from an array of length %d \n", pb, m);
+			return 2;
+		}
 
-	free(s1);
+	a = (double*)malloc(n * sizeof(double));
+	b = (double*)malloc(m * sizeof(double));
+	if (!(a && b))
+		{
+			printf("Not enough memory! \n");
+			return 3;
+		}
+
+	if (file_name_a)
+		{	
+			res = read_array(a, n, file_name_a);
+			if (res != SUCCESS)
+				{	
+					switch (res) 
+			      {
+			        case ERROR_OPEN:
+			          printf("Error: Can not read from %s \n", file_name_a);
+			          break;
+			        case ERROR_READ:
+			          printf("Error: Invalid character in the file %s \n", file_name_a);
+			          break;
+			        case EMPTY_FILE:
+			        	printf("File %s is empty \n", file_name_a);
+			        	break;
+			        case NOT_ENOUGH_ELEMENTS:
+			        	printf("Not enough elements in file %s \n", file_name_a);
+			        	break;
+			        default:
+			          printf("Unknown error\n");
+			           break;
+			      }
+			    free(a);
+			    return 3;
+				}
+		}
+	else init_array(a, n, sa);
+	printf("Array A:\n");
+	print_array(a, n, pa);
+
+	if (file_name_b)
+		{	
+			res = read_array(b, m, file_name_b);
+			if (res != SUCCESS)
+				{	
+					switch (res) 
+			      {
+			        case ERROR_OPEN:
+			          printf("Error: Can not read from %s \n", file_name_b);
+			          break;
+			        case ERROR_READ:
+			          printf("Error: reading the file %s \n", file_name_b);
+			          break;
+			        case EMPTY_FILE:
+			        	printf("File %s is empty \n", file_name_b);
+			        	break;
+			        case NOT_ENOUGH_ELEMENTS:
+			        	printf("Not enough elements in file %s \n", file_name_b);
+			        	break;
+			        default:
+			          printf("Unknown error\n");
+			          break;
+			      }
+			    free(a);
+			    free(b);
+			    return 3;
+				}
+		}
+	else init_array(b, m, sb);
+
+	c = (double*)malloc((m + n) * sizeof(double));
+	if (!c) printf("Not rnough memory\n");
+
+	printf("Array B:\n");
+	print_array(b, m, pb);
+
+	if (cmp == 1) cmp_func = compare1;
+	else if (cmp == 2) cmp_func = compare2;
+	else
+		{	
+			printf("Invalid value for c. Must be 1 or 2 \n");
+			return 1;
+		}
+
+	t = clock();
+	merge_arrays(a, b, c, n, m, cmp_func);
+	t = (clock() - t) / CLOCKS_PER_SEC;
+
+	printf("New array: \n");
+	print_array(c, n + m, pa + pb);
+	diff = diff_calculation(c, n + m, cmp_func);
+
+	printf("%s : Task = %d Diff = %d Elapsed = %.2f\n", argv[0], 2, diff, t);
+	free(a);
+	free(b);
+	free(c);
 	return 0;
 }

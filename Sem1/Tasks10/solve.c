@@ -1,454 +1,159 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <math.h>
+#include <string.h>
 #include "solve.h"
-#include "string_io.c"
 
-int task01(char *filename_a, char *filename_b, char *s)
+size_t strlen_(const char *s) 
 {
-	int count = 0;
-	char buff[LEN];
-	FILE *file_a;
-	FILE *file_b;
-
-	if (!(file_a = fopen(filename_a, "r"))) return ERROR_OPEN;
-	if (!(file_b = fopen(filename_b, "w"))) 
-	{
-		fclose(file_a);
-		return ERROR_OPEN;
-	}
-
-	while (fgets(buff, LEN, file_a))
-		{
-			if (strcasestr_(buff, s)) 
-				{
-					fprintf(file_b, "%s", buff);
-					count ++;
-				}
-		}
-
-	if (!feof(file_a))
-		{
-			fclose(file_a);
-			fclose(file_b);
-			return ERROR_READ;
-		}
-
-	fclose(file_b);
-	fclose(file_a);
-	return count;
+  size_t i = 0;
+  for (i = 0; s[i]; i++);
+  return i;
 }
 
-int task02(char *filename_a, char *filename_b, char *s)
+char *strcpy_(char *s1, const char *s2) 
 {
-	int count = 0;
-	char buff[LEN];
-	size_t len_s = strlen(s);
-	size_t len_buff = 0;
-	FILE *file_a;
-	FILE *file_b;
+  size_t i;
+  char *tmp = s1;
+  for (i = 0; (s1[i] = s2[i]); i++);
+  return tmp;
+}
 
-	if (!(file_a = fopen(filename_a, "r"))) return ERROR_OPEN;
-	if (!(file_b = fopen(filename_b, "w"))) 
-	{
-		fclose(file_a);
-		return ERROR_OPEN;
-	}
+char *strchr_(const char *s, int ch)
+{
+  size_t i;
+  for (i = 0; s[i]; i++) 
+    { 
+      if (s[i] == (char) ch) return (char *)s + i;
+    }
+  if (s[i] == (char) ch) return (char *)s + i;
+  return 0;
+}  
 
-	while (fgets(buff, LEN, file_a))
-		{
-			len_buff = strlen(buff) - 1;
-			if (strncmp_(buff + len_buff - len_s, s, len_s) == 0)
-				{
-					fprintf(file_b, "%s", buff);
-					count ++;
-				}
-		}
-	if (!feof(file_a))
-		{
-			fclose(file_a);
-			fclose(file_b);
-			return ERROR_READ;
-		}
-
-	fclose(file_b);
-	fclose(file_a);
-	return count;
+char *strrchr_(const char *s, int ch)
+{
+  size_t i;
+  size_t ind = 0;
+  for (i = 0; s[i]; i++)
+    {
+      if (s[i] == (char) ch) ind = i + 1;
+    }
+  if (s[i] == (char) ch) ind = i + 1;
+  if (ind == 0) return 0;
+  return (char *)s + (ind - 1);
 }
 
 
-int task03(char *filename_a, char *filename_b, char *s, char *t)
+char* strcat_(char* s1, const char* s2) 
 {
-	int count = 0, flag = 0;
-	char buff[LEN] = {0};
-	char *pos;
-	char *next;
-	size_t len_t = 0, len_s = 0, len = 0;
-	char result[LEN] = {0};
-	FILE *file_a;
-	FILE *file_b;
+  char* original_s1 = s1;
+  size_t i;
+  s1 += strlen_(s1);
+  for (i = 0; (s1[i] = s2[i]); i++);
+    
+  return original_s1;
+} 
 
-	len_t = strlen(t);
-	len_s = strlen(s);
+int strcmp_ (const char *s1, const char *s2)
+{
+  size_t i = 0;
+  while (s1[i] && s2[i] && s1[i] == s2[i]) i++;
+  return s1[i] - s2[i];
+}
 
-	result[0] = 0;
+size_t strcspn_ (const char *s1, const char *s2)
+{
+  size_t i = 0;
+  char alph[256] = {0};
+  size_t cnt = 0;
+  for (i = 0; s2[i]; i++)
+    {
+      alph[(int)(s2[i])] = 1;
+    }
 
-	if (len_s == 0) 
-		{
-			return EMPTY_STRING;
-		}
+  for (i = 0; s1[i]; i++)
+    {
+      if (alph[(int)(s1[i])] == 0) cnt ++;
+      else break;
+    }
+  return cnt;
+}
 
-	if (!(file_a = fopen(filename_a, "r"))) return ERROR_OPEN;
-	if (!(file_b = fopen(filename_b, "w"))) 
-	{
-		fclose(file_a);
-		return ERROR_OPEN;
-	}
+size_t strspn_ (const char *s1, const char *s2)
+{
+  size_t i = 0;
+  char alph[256] = {0};
+  size_t cnt = 0;
+  for (i = 0; s2[i]; i++)
+    {
+      alph[(int)(s2[i])] = 1;
+    }
 
-	while (fgets(buff, LEN, file_a)) 
-		{
-      pos = buff;
-      flag = 0;
-      while ((next = strstr(pos, s)) != 0) 
-        {
-        	len = next - pos;
-          strncat_(result, pos, len);
-          strncat_(result + len, t, len_t);
-          pos = next + len_s;
-          flag = 1;
+  for (i = 0; s1[i]; i++)
+    {
+      if (alph[(int)(s1[i])] == 1) cnt ++;
+      else break;
+    }
+  return cnt;
+}
+
+char *strstr_ (const char *string1, const char *string2) {
+
+    size_t i, j;
+    size_t len1 = strlen(string1);
+    size_t len2 = strlen(string2);
+
+    if (len2 == 0) return (char *)string1;
+
+    for (i = 0; i <= len1; i++) {
+        if (string1[i] == string2[0]) {
+            for (j = 1; j < len2; j++) {
+                if (string1[i + j] != string2[j]) {
+                    break;
+                }
+            }
+            if (j == len2) {
+                return (char *)&string1[i];
+            }
         }
-      strcat(result, pos);
-  		if (flag) count++;
-  		fprintf(file_b, "%s", result);
-      result[0] = 0; 
-		}
-
-  if (!feof(file_a))
-		{
-			fclose(file_a);
-			fclose(file_b);
-			return ERROR_READ;
-		}
-	fclose(file_b);
-	fclose(file_a);
-	return count;
-}
-
-int task04(char *filename_a, char *filename_b, char *s, char *t)
-{
-	char buff[LEN] = {0};
-	char purified_buff[LEN] = {0};
-	char purified_s[LEN] = {0};
-	size_t len_buff = 0, len_s = 0;
-	int count = 0;
-	size_t i = 0, j = 0;
-
-
-	FILE *file_a;
-	FILE *file_b;
-
-	if (!(file_a = fopen(filename_a, "r"))) return ERROR_OPEN;
-	if (!(file_b = fopen(filename_b, "w"))) 
-	{
-		fclose(file_a);
-		return ERROR_OPEN;
-	}
-
-
-	while (fgets(buff, LEN, file_a)) 
-		{
-			i = 0;
-      j = 0;
-			purified_buff[0] = 0;
-
-			len_buff = strlen(buff);
-			for (i = 0; i < len_buff; i++)
-				{
-					if (!strchr(t, buff[i]))
-						{
-							purified_buff[j] = buff[i];
-							j++;
-						}
-				}
-			purified_buff[j - 1] = 0;
-
-			j = 0;
-			purified_s[0] = 0;
-
-			len_s = strlen(s);
-			for (i = 0; i < len_s; i++)
-				{
-					if (!strchr(t, s[i]))
-						{
-							purified_s[j] = s[i];
-							j++;
-						}
-				}
-			purified_s[j] = 0;
-
-      if (strcmp(purified_buff, purified_s) != 0)
-      	{
-      		count ++;
-      		fprintf(file_b, "%s", buff);
-      	}
-		}
-
-  if (!feof(file_a))
-		{
-			fclose(file_a);
-			fclose(file_b);
-			return ERROR_READ;
-		}
-
-	fclose(file_b);
-	fclose(file_a);
-	return count;
-}
-
-int task05(char *filename_a, char *filename_b, char *s, char *t)
-{
-	char buff[LEN] = {0};
-	int count = 0;
-	size_t i = 0;
-	int flag = 1;
-
-	FILE *file_a;
-	FILE *file_b;
-
-	if (!(file_a = fopen(filename_a, "r"))) return ERROR_OPEN;
-	if (!(file_b = fopen(filename_b, "w"))) 
-	{
-		fclose(file_a);
-		return ERROR_OPEN;
-	}
-
-
-	while (fgets(buff, LEN, file_a)) 
-		{
-			i = 0;
-			flag = 1;
-      while (buff[i + 1] != 0)
-      	{
-      		if ((strchr(s, buff[i]) == 0) && (strchr(t, buff[i]) == 0)) 
-      			{
-      				flag = 0;
-      				break;
-      			}
-      		i++;
-      	}
-      if (flag)
-      	{
-      		count ++;
-      		fprintf(file_b, "%s", buff);
-      	}
-		}
-
-  if (!feof(file_a))
-		{
-			fclose(file_a);
-			fclose(file_b);
-			return ERROR_READ;
-		}
-		
-	fclose(file_b);
-	fclose(file_a);
-	return count;
-}
-
-int task06(char *filename_a, char *filename_b, char *s, char *t)
-{
-	char buff[LEN] = {0};
-	int count = 0;
-	size_t i = 0, len_buff = 0, j = 0, len_s = 0;
-	char purified_buff[LEN] = {0};
-	char purified_s[LEN] = {0};
-
-	FILE *file_a;
-	FILE *file_b;
-
-	if (!(file_a = fopen(filename_a, "r"))) return ERROR_OPEN;
-	if (!(file_b = fopen(filename_b, "w"))) 
-	{
-		fclose(file_a);
-		return ERROR_OPEN;
-	}
-
-	while (fgets(buff, LEN, file_a)) 
-		{
-			j = 0;
-			purified_buff[0] = 0;
-
-			len_buff = strlen(buff);
-			for (i = 0; i < len_buff; i++)
-				{
-					if (!strchr(t, buff[i]))
-						{
-							purified_buff[j] = buff[i];
-							j++;
-						}
-				}
-			purified_buff[j] = 0;
-
-			j = 0;
-			purified_s[0] = 0;
-
-			len_s = strlen(s);
-			for (i = 0; i < len_s; i++)
-				{
-					if (!strchr(t, s[i]))
-						{
-							purified_s[j] = s[i];
-							j++;
-						}
-				}
-			purified_s[j] = 0;
-
-			if (strstr(purified_buff, purified_s))
-				{
-					fprintf(file_b, "%s", buff);
-					count ++;
-				}
-		}
-
-  if (!feof(file_a))
-		{
-			fclose(file_a);
-			fclose(file_b);
-			return ERROR_READ;
-		}
-		
-	fclose(file_b);
-	fclose(file_a);
-	return count;
-}
-
-int task07(char *filename_a, char *filename_b, char *s, char *t)
-{
-	char buff[LEN] = {0};
-	int count = 0;
-	size_t i = 0;
-	char *normal_s = 0;
-
-	FILE *file_a;
-	FILE *file_b;
-
-	if (!(file_a = fopen(filename_a, "r"))) return ERROR_OPEN;
-	if (!(file_b = fopen(filename_b, "w"))) 
-	{
-		fclose(file_a);
-		return ERROR_OPEN;
-	}
-
-	while (fgets(buff, LEN, file_a)) 
-		{
-			i = 0;
-			while (strchr(t, s[i]) && s[i]) i++;
-			normal_s = s + i;
-			if (strstr(buff, normal_s) != 0)
-				{
-					count ++;
-					fprintf(file_b, "%s", buff);
-				}
-		}
-
-  if (!feof(file_a))
-		{
-			fclose(file_a);
-			fclose(file_b);
-			return ERROR_READ;
-		}
-		
-	fclose(file_b);
-	fclose(file_a);
-	return count;
-}
-
-int task08(char *filename_a, char *filename_b, char *s, char *l, char *r)
-{
-	int count = 0, flag = 0;
-	char buff[LEN] = {0};
-	char *pos = 0;
-	char *next = 0;
-	char t[LEN] = {0};
-	char result[LEN] = {0};
-	size_t len_t = 0, len_s = 0, len = 0;
-
-	FILE *file_a;
-	FILE *file_b;
-
-	len_s = strlen(s);
-	len_t = len_s + strlen(l) + strlen(r) + 1;
-
-
-	result[0] = 0;
-
-	if (len_s == 0) 
-		{
-			return EMPTY_STRING;
-		}
-
-	strcpy(t, l);
-	strcat(t, s);
-	strcat(t, r);
-	len_t = strlen(t);
-
-	if (!(file_a = fopen(filename_a, "r"))) return ERROR_OPEN;
-	if (!(file_b = fopen(filename_b, "w"))) 
-	{
-		fclose(file_a);
-		return ERROR_OPEN;
-	}
-
-	while (fgets(buff, LEN, file_a)) 
-		{
-      pos = buff;
-      flag = 0;
-      while ((next = strstr(pos, s)) != 0) 
-        {
-        	len = next - pos;
-          strncat_(result, pos, len);
-          strncat_(result + len, t, len_t);
-          pos = next + len_s;
-          flag = 1;
-        }
-      strcat(result, pos);
-  		if (flag) count++;
-  		fprintf(file_b, "%s", result);
-      result[0] = 0; 
-		}
-
-  if (!feof(file_a))
-		{
-			fclose(file_a);
-			fclose(file_b);
-			return ERROR_READ;
-		}
-	fclose(file_b);
-	fclose(file_a);
-	return count;
+    }
+    return (char *)&string1[len1];
 }
 
 
+char *strtok_r_ (char *str, const char* delim, char **saveptr) {
+  size_t start, end;
 
+  if (!str) {
+    *saveptr = 0;
+    return 0;
+  }
 
+  start = strspn(str, delim);
+  str += start;
 
+  if (strlen(str) == 0) 
+    {
+      *saveptr = 0;
+      return 0;
+    }
 
+  end = strcspn(str, delim);
 
+  if (str[end] != '\0') 
+    {
+      str[end] = '\0';
+      *saveptr = str + end + 1;
+    } 
+  else 
+    {
+      *saveptr = 0;
+    }
 
+  return str;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+  
 
 
 

@@ -10,5 +10,3 @@ double f(int s, int n, int i);
 int read_array(double *a, int n, const char *name);
 int init_array(double *a, int n, int s);
 void print_array(const double *a, int n, int p);
-int compare1(double x, double y);
-int compare2(double x, double y);

@@ -7,14 +7,14 @@
 
 int main(int argc, char *argv[])
 {
-	int n, p, s, diff;
+	int n, p;
 	char *file_name = 0;
 	double *a;
 	double t;
 	int res;
-	if (!((argc == 4 || argc == 5) && sscanf(argv[1], "%d", &n) == 1 && sscanf(argv[2], "%d", &p) == 1 && sscanf(argv[3], "%d", &s) == 1))
+	if (!((argc == 4) && sscanf(argv[1], "%d", &n) == 1 && sscanf(argv[2], "%d", &p) == 1))
 		{	
-			printf("Usage: %s n p s [file] \n", argv[0]);
+			printf("Usage: %s n p [file] \n", argv[0]);
 			return 1;
 		}
 
@@ -24,13 +24,8 @@ int main(int argc, char *argv[])
 			return 2;
 		}
 
-	if ((s == 0 && argc != 5) || (s != 0 && argc == 5))
-		{
-			printf("Need to set s = 0 or add file_name \n");
-			return 4;
-		}
+	file_name = argv[3];
 
-	if (argc == 5) file_name = argv[4];
 	a = (double*)malloc(n * sizeof(double));
 	if (!a)
 		{
@@ -38,42 +33,32 @@ int main(int argc, char *argv[])
 			return 3;
 		}
 
-	if (file_name)
-		{	
-			res = read_array(a, n, file_name);
-			if (res != SUCCESS)
-				{	
-					switch (res) 
-			      {
-			        case ERROR_OPEN:
-			          printf("Error: Can not read from %s \n", file_name);
-			          break;
-			        case ERROR_READ:
-			          printf("Error: reading the file %s \n", file_name);
-			          break;
-			        case EMPTY_FILE:
-			        	printf("File %s is empty \n", file_name);
-			        	break;
-			        case NOT_ENOUGH_ELEMENTS:
-			        	printf("Not enough elements in file %s \n", file_name);
-			        	break;
-			        default:
-			          printf("Unknown error\n");
-			           break;
-			      }
-			    free(a);
-			    return 3;
-				}
-		}
-	else init_array(a, n, s);
-	print_array(a, n, p);
 	t = clock();
-	linear_insert_sort(a, n);
+	res = task6(file_name, a, n);
+	if (res < 0)
+		{	
+			switch (res) 
+	      	{
+		        case ERROR_OPEN:
+		          printf("Error: Can not read from %s \n", file_name);
+		          break;
+		        case ERROR_READ:
+		          printf("Error: reading the file %s \n", file_name);
+		          break;
+		        case EMPTY_FILE:
+		        	printf("File %s is empty \n", file_name);
+		        	break;
+		        default:
+		          printf("Unknown error\n");
+		          break;
+	      	}
+	    free(a);
+	    return 3;
+		}
 	t = (clock() - t) / CLOCKS_PER_SEC;
-	diff = diff_calculation(a, n);
 	printf("New array:\n");
-	print_array(a, n, p);
-	printf("%s : Task = %d Diff = %d Elapsed = %.2f\n", argv[0], 6, diff, t);
+	print_array(a, res, p);
+	printf("%s : Task = %d Result = %d Elapsed = %.2f\n", argv[0], 6, res, t);
 	free(a);
 	return 0;
 }
