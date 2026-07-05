@@ -68,11 +68,11 @@ int main(int argc, char *argv[])
 		else init_array(a, n, s);
 		print_array(a, n, p);
 		t = clock();
-		res = filter_array3(a, n);
+		res = replace_with_means(a, n);
 		t = (clock() - t) / CLOCKS_PER_SEC;
 		printf("New array:\n");
-		print_array(a, res, p);
-		printf("%s : Task = %d Result = %d Elapsed = %.2f\n", argv[0], 3, res, t);
+		print_array(a, n, p);
+		printf("%s : Task = %d Elapsed = %.2f\n", argv[0], 3, t);
 		free(a);
 		return 0;
 }

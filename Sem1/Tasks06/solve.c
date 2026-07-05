@@ -3,355 +3,203 @@
 #include "solve.h"
 #include "array_io.h"
 
-int binary_search(double *a, int n, double value, int type)
+int is_polyndrom(double *a, int n)
 {
-    int low = 0, high = n - 1;
-    while (low <= high)
+	int i;
+	for (i = 0; i < n; i++)
+		{	
+			if (fabs(a[i] - a[n - i - 1]) > EPS)
+				{
+					return 0;
+				}
+		}
+	return 1;
+}
+
+int reverse_array(double *a, int n)
+{
+	int i;
+	double tmp;
+	for (i = 0; i < n / 2; i++) 
+		{	
+			tmp = a[n - i - 1];
+			a[n - i - 1] = a[i];
+			a[i] = tmp; 
+		}
+	return 0;
+}
+
+int replace_with_means(double *a, int n)
+{
+	int i;
+	double prev2, prev1 = a[0];
+	for (i = 1; i < n - 1; i++) 
+		{	
+			prev2 = a[i];
+			a[i] = (prev1 + a[i + 1]) / 2.;
+			prev1 = prev2;
+		}
+	return 0;
+}
+
+int right_shift(double *a, int n)
+{
+	int i;
+	double tmp = a[n - 1];
+	for (i = n - 1; i > 0; i--) 
+		{	
+			a[i] = a[i - 1];
+		}
+	a[0] = tmp;
+	return 0;
+}
+
+int right_shift_k(int k, double *a, int n)
+{
+	int i, new_index, j = 0;
+	double tmp1, tmp2;
+	while (k < 0)
+		{	
+			k += n;
+		}
+	k %= n;
+
+	tmp1 = a[0];
+	for (i = 0; i < n; i++) 
+		{
+			new_index = ((i + 1) * k) % n + j;
+			tmp2 = a[new_index];
+			a[new_index] = tmp1;
+			tmp1 = tmp2;
+			if (i != n - 1 && new_index == 0)
+				{
+					j ++;
+					tmp1 = a[((i + 1) * k) % n + j];
+				}
+		}
+	return 0;
+}
+
+int delete_small_elements(double x, double *a, int n)
+{
+	int i, j = 0;
+  for (i = 0; i < n; i++) 
     {
-        int mid = (low + high) / 2;
-        if (fabs(a[mid] - value) < EPS)
-        {
-            return mid;
-        }
-        else if ((a[mid] < value) * type + (a[mid] > value) * (1 - type))
-        {
-            low = mid + 1;
-        }
-        else
-        {
-            high = mid - 1;
+      if (a[i] >= x) 
+      	{
+          a[j++] = a[i];
         }
     }
-    return low;
+  return j;
 }
 
-int filter_array1(double *a, int n)
+
+int num_of_identical(const char *file_b, double *a, int n)
 {
-	int i, j = 0, arithmetic_cnt = 0;
-	double arithmetic_sum = 0, arithmetic_mean;
-	double tmp = 0;
-	for (i = 1; i < n - 1; i++)
-		{	
-			if (a[i - 1] * a[i + 1] >= 0)
-				{
-				  tmp = a[i] * a[i];
-				  if (a[i] < 0) tmp *= -1;
-				  if (tmp < (a[i + 1] * a[i - 1]))
-						{	
-							arithmetic_sum += a[i];
-							arithmetic_cnt ++;
-						}
-				}
-		}
+	FILE *fp; int i = 0;
+	double x;
+	int cnt = 0;
+	if (!(fp = fopen(file_b, "r"))) return ERROR_OPEN;
 
-	if (arithmetic_cnt != 0)
-		{
-			arithmetic_mean = arithmetic_sum / arithmetic_cnt;
-			for (i = 0; i < n; i++)
-			{
-				if (a[i] >= arithmetic_mean) a[j++] = a[i];
-			}
-			return j;
-		}
-	
-	return n;
-}
-
-int filter_array2(double *a, int n)
-{
-	int i, flag = 0, j = 0, arithmetic_cnt = 0;
-	double arithmetic_sum = 0, arithmetic_mean;
-	for (i = 0; i < n - 1; i++)
-		{	
-			if (fabs(a[i] - a[i + 1]) < EPS)
-				{	
-					arithmetic_sum += a[i];
-					arithmetic_cnt ++;
-					flag = 1;
-				}
-			else if (flag)
-				{
-					arithmetic_sum += a[i];
-					arithmetic_cnt ++;
-					flag = 0;
-				}
-		}
-
-	if (flag)
-		{
-			arithmetic_sum += a[i];
-			arithmetic_cnt ++;
-		}
-
-	if (arithmetic_cnt != 0)
-	{
-		arithmetic_mean = arithmetic_sum / arithmetic_cnt;
-		for (i = 0; i < n; i++)
-		{
-			if (a[i] >= arithmetic_mean) a[j++] = a[i];
-		}
-		return j;
-	}
-	
-	return n;
-}
-
-int filter_array3(double *a, int n)
-{
-	int i, mcurr_length = 0, flag = 0, j = 0, arithmetic_cnt = 0;
-	double arithmetic_sum = 0, mcurr_sum = 0, arithmetic_mean;
-	for (i = 0; i < n - 1; i++)
-		{	
-			if (a[i] <= a[i + 1])
-				{	
-					arithmetic_sum += a[i];
-					arithmetic_cnt ++;
-					flag = 1;
-				}
-			else if (flag)
-				{
-					if (arithmetic_cnt > mcurr_length)
-						{	
-							mcurr_sum = arithmetic_sum + a[i];
-							mcurr_length = arithmetic_cnt + 1;
-							arithmetic_mean = mcurr_sum / mcurr_length;
-						}
-					flag = 0;
-					arithmetic_sum = 0;
-					arithmetic_cnt = 0;
-				}
-		}
-	if (arithmetic_cnt > mcurr_length)
-		{	
-			mcurr_sum = arithmetic_sum + a[i];
-			mcurr_length = arithmetic_cnt + 1;
-			arithmetic_mean = mcurr_sum / mcurr_length;
-		}	
-
-	for (i = 0; i < n; i++)
-	{
-		if (a[i] >= arithmetic_mean) a[j++] = a[i];
-	}
-	return j;
-}
-
-int filter_array4(int k, double *a, int n)
-{
-	int i, j = 0, flag = 0, const_cnt = 1;
-	double mcurr_const_el;
-	for (i = 0; i < n - 1; i++)
-		{	
-			if (fabs(a[i] - a[i + 1]) < EPS)
-				{
-					const_cnt ++;
-					if (const_cnt >= k)
-						{	
-							if (flag == 0)
-								{
-									mcurr_const_el = a[i];
-								}
-							if (a[i] > mcurr_const_el)
-								{	
-									mcurr_const_el = a[i];
-								}
-							flag = 1;
-						}
-				}
-			else
-				{	
-					const_cnt = 1;
-				}
-		}
-	if (flag)
+	while (fscanf(fp, "%lf", &x) == 1)
 		{
 			for (i = 0; i < n; i++)
-				{
-					if (a[i] >= mcurr_const_el) a[j++] = a[i];
-				}
-			return j;
-		}
-	return n;
-}
-
-int filter_array5(int k, double *a, int n)
-{
-	int i, j = 0, cnt = 0, arithmetic_cnt = 0;
-	double arithmetic_sum = 0, summ = 0, arithmetic_mean; 
-	for (i = 0; i < n - 1; i++)
-		{	
-			if (a[i] >= a[i + 1])
-				{
-					cnt ++;
-					summ += a[i];
-					while (i != n - 1 && a[i] >= a[i + 1])
-						{	
-							cnt ++;
-							summ += a[i + 1];
-							i++;
-						}
-					if (cnt >= k)
+				{	
+					if (fabs(x - a[i]) < EPS) 
 						{
-							arithmetic_cnt += cnt;
-							arithmetic_sum += summ;
+							cnt++;
+							break;
 						}
-					summ = 0; 
+				}
+		}
+	return cnt;
+}
+
+int num_of_occurrences(const char *file_b, double *a, int n)
+{
+	FILE *fp;
+	double x;
+	int oc_cnt = 0;
+	int cnt = 0;
+
+	if (!(fp = fopen(file_b, "r"))) return ERROR_OPEN;
+
+	while (fscanf(fp, "%lf", &x) == 1)
+		{
+			if (fabs(x - a[cnt]) < EPS) cnt++;
+			else
+				{
+					if (fabs(x - a[0]) < EPS) cnt = 1;
+					else cnt = 0;
+				}
+			if (cnt == n)
+				{	
+					oc_cnt ++;
 					cnt = 0;
 				}
 		}
-	if (arithmetic_cnt != 0)
+	fclose(fp);
+	return oc_cnt;
+}
+
+int connect_arrays(const double *a, const double *b, double *c, int n, int m)
+{
+	int i = 0, j = 0, k = 0;
+  while (i < n && j < m) 
+  {
+    if (a[i] < b[j])
+    	{
+    		c[k] = a[i];
+    		k++;
+    		i++;
+    	}
+    else if (a[i] > b[j])
+    	{	
+    		c[k] = b[j];
+    		k++;
+    		j++;
+    	}
+    else
+    	{	
+    		c[k] = a[i];
+    		i++;
+    		j++;
+    		k++;
+    	}
+  }
+
+  for (; i < n; i++)
+  	{	
+  		c[k] = a[i];
+  		k++;
+  	}
+  for (; j < m; j++)
+  	{	
+  		c[k] = b[j];
+  		k++;
+  	}
+
+  return k;
+}
+
+int delete_duplicates(double *a, double *b, int n, int m)
+{
+	int i = 0, j = 0, l = 0;
+	int flag = 0;
+
+	while (i < n)
 		{
-			arithmetic_mean = arithmetic_sum / arithmetic_cnt;
-			for (i = 0; i < n; i++)
-				{
-					if (a[i] >= arithmetic_mean) a[j++] = a[i];
+			flag = 0;
+			for (j = 0; j < m; j++)
+				{	
+					if (fabs(a[i] - b[j]) < EPS)
+					{
+						flag = 1;
+						break;
+					} 
 				}
-			return j;
+			if (!flag) a[l++] = a[i];
+			i++;
 		}
-	return n;
-}
-
-int task6(char *file, double *a, int n)
-{
-    FILE *fp;
-    int i = 0, j, k, ind;
-    double curr, prev;
-    int cnt = 0;
-    int type_of_bin = 1;
-
-    if (!(fp = fopen(file, "r"))) return ERROR_OPEN;
-
-    if (fscanf(fp, "%lf", &prev) != 1)
-    {
-        if (feof(fp))
-        {
-            fclose(fp);
-            return 0;
-        }
-        fclose(fp);
-        return ERROR_READ;
-    }
-    
-    while (fscanf(fp, "%lf", &curr) == 1)
-    {
-        if (fabs(prev - curr) < EPS)
-        {
-            for (j = 0; j < i; j++)
-            {
-                if (fabs(a[j] - curr) > EPS)
-                {
-                    cnt++;
-                }
-            }
-            if (cnt == i)
-            {
-                ind = binary_search(a, i, curr, type_of_bin);
-                if (ind != -1)
-                {
-                    i++;
-                    if (i == n + 1) i--;
-                    for (k = i - 1; k >= ind; k--)
-                    {
-                        a[k + 1] = a[k];
-                    }
-                    a[ind] = curr;
-                }
-                else
-                {
-                    a[i] = curr;
-                    i++;
-                    if (i == n + 1) i--;
-                }
-            }
-            cnt = 0;
-        }
-        prev = curr;
-    }
-
-    if (!feof(fp))
-    {
-        fclose(fp);
-        return ERROR_READ;
-    }
-
-    fclose(fp);
-    return i;
-}
-
-int task7(char *file, double *a, int n)
-{
-    FILE *fp;
-    int i = 0, j, k, ind;
-    double curr, prev2, prev1;
-    int type_of_bin = 0;
-    int cnt = 0;
-
-    if (!(fp = fopen(file, "r"))) return ERROR_OPEN;
-
-    if (fscanf(fp, "%lf", &prev2) != 1)
-    {
-        if (feof(fp))
-        {
-            fclose(fp);
-            return 0;
-        }
-        fclose(fp);
-        return ERROR_READ;
-    }
-
-   	if (fscanf(fp, "%lf", &prev1) != 1)
-    {
-        if (feof(fp))
-        {
-            fclose(fp);
-            return 0;
-        }
-        fclose(fp);
-        return ERROR_READ;
-    }
-    
-    while (fscanf(fp, "%lf", &curr) == 1)
-    {
-        if (prev2 < prev1 && prev1 > curr)
-        {
-          for (j = 0; j < i; j++)
-            {
-                if (fabs(a[j] - prev1) > EPS)
-                	{
-                    cnt++;
-                	}
-            }
-          if (cnt == i)
-            {
-              ind = binary_search(a, i, prev1, type_of_bin);
-              if (ind != -1)
-	              {
-	                  i++;
-	                  if (i == n + 1) i--;
-	                  for (k = i - 1; k >= ind; k--)
-	                  {
-	                      a[k + 1] = a[k];
-	                  }
-	                  a[ind] = prev1;
-	              }
-              else
-	              {
-	                  a[i] = prev1;
-	                  i++;
-	                  if (i == n + 1) i--;
-	              }
-            }
-            cnt = 0;
-        }
-        prev2 = prev1;
-        prev1 = curr;
-    }
-
-    if (!feof(fp))
-    {
-        fclose(fp);
-        return ERROR_READ;
-    }
-
-    fclose(fp);
-    return i;
+	return l;
 }

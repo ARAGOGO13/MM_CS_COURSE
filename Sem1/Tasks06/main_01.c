@@ -68,10 +68,8 @@ int main(int argc, char *argv[])
 		else init_array(a, n, s);
 		print_array(a, n, p);
 		t = clock();
-		res = filter_array1(a, n);
+		res = is_polyndrom(a, n);
 		t = (clock() - t) / CLOCKS_PER_SEC;
-		printf("New array:\n");
-		print_array(a, res, p);
 		printf("%s : Task = %d Result = %d Elapsed = %.2f\n", argv[0], 1, res, t);
 		free(a);
 		return 0;

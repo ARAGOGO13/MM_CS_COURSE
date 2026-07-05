@@ -1,164 +1,270 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
-#include <string.h>
 #include "solve.h"
+#include "array_io.h"
 
-size_t strlen_(const char *s) 
+void swap(double *a, double *b)
 {
-  size_t i = 0;
-  for (i = 0; s[i]; i++);
-  return i;
+	double c = *a;
+	*a = *b;
+	*b = c;
 }
 
-char *strcpy_(char *s1, const char *s2) 
+int diff_calculation(double *a, int n, int(*cmp)(double, double))
 {
-  size_t i;
-  char *tmp = s1;
-  for (i = 0; (s1[i] = s2[i]); i++);
-  return tmp;
+	int i, cnt = 0;
+	for (i = 0; i < n - 1; i++)
+		{	
+			if ((*cmp)(a[i], a[i + 1]) > 0) cnt++;
+		}
+	return cnt;
 }
 
-char *strchr_(const char *s, int ch)
+int binary_search(double *a, int n, double x, int(*cmp)(double, double))
 {
-  size_t i;
-  for (i = 0; s[i]; i++) 
-    { 
-      if (s[i] == (char) ch) return (char *)s + i;
-    }
-  if (s[i] == (char) ch) return (char *)s + i;
-  return 0;
-}  
-
-char *strrchr_(const char *s, int ch)
-{
-  size_t i;
-  size_t ind = 0;
-  for (i = 0; s[i]; i++)
-    {
-      if (s[i] == (char) ch) ind = i + 1;
-    }
-  if (s[i] == (char) ch) ind = i + 1;
-  if (ind == 0) return 0;
-  return (char *)s + (ind - 1);
+	int left = 0, right = n;
+	int mid = 0;
+	while (left != right)
+		{	
+			mid = (left + right) / 2;
+			if ((*cmp)(a[mid], x) < 0)
+				{	
+					left = mid + 1;
+				}
+			else
+				{	
+					right = mid;
+				}
+		}
+	return left;
 }
 
-
-char* strcat_(char* s1, const char* s2) 
+void merge_arrays(double *a, double *b, double *c, int n, int m, int(*cmp)(double, double))
 {
-  char* original_s1 = s1;
-  size_t i;
-  s1 += strlen_(s1);
-  for (i = 0; (s1[i] = s2[i]); i++);
-    
-  return original_s1;
-} 
-
-int strcmp_ (const char *s1, const char *s2)
-{
-  size_t i = 0;
-  while (s1[i] && s2[i] && s1[i] == s2[i]) i++;
-  return s1[i] - s2[i];
-}
-
-size_t strcspn_ (const char *s1, const char *s2)
-{
-  size_t i = 0;
-  char alph[256] = {0};
-  size_t cnt = 0;
-  for (i = 0; s2[i]; i++)
-    {
-      alph[(int)(s2[i])] = 1;
-    }
-
-  for (i = 0; s1[i]; i++)
-    {
-      if (alph[(int)(s1[i])] == 0) cnt ++;
-      else break;
-    }
-  return cnt;
-}
-
-size_t strspn_ (const char *s1, const char *s2)
-{
-  size_t i = 0;
-  char alph[256] = {0};
-  size_t cnt = 0;
-  for (i = 0; s2[i]; i++)
-    {
-      alph[(int)(s2[i])] = 1;
-    }
-
-  for (i = 0; s1[i]; i++)
-    {
-      if (alph[(int)(s1[i])] == 1) cnt ++;
-      else break;
-    }
-  return cnt;
-}
-
-char *strstr_ (const char *string1, const char *string2) {
-
-    size_t i, j;
-    size_t len1 = strlen(string1);
-    size_t len2 = strlen(string2);
-
-    if (len2 == 0) return (char *)string1;
-
-    for (i = 0; i <= len1; i++) {
-        if (string1[i] == string2[0]) {
-            for (j = 1; j < len2; j++) {
-                if (string1[i + j] != string2[j]) {
-                    break;
-                }
-            }
-            if (j == len2) {
-                return (char *)&string1[i];
-            }
-        }
-    }
-    return (char *)&string1[len1];
-}
-
-
-char *strtok_r_ (char *str, const char* delim, char **saveptr) {
-  size_t start, end;
-
-  if (!str) {
-    *saveptr = 0;
-    return 0;
+	int i = 0, j = 0, k = 0;
+  while (i < n && j < m) 
+  {
+    if ((*cmp)(a[i], b[j]) < 0)
+    	{
+    		c[k] = a[i];
+    		k++;
+    		i++;
+    	}
+    else
+    	{	
+    		c[k] = b[j];
+    		k++;
+    		j++;
+    	}
   }
 
-  start = strspn(str, delim);
-  str += start;
-
-  if (strlen(str) == 0) 
-    {
-      *saveptr = 0;
-      return 0;
-    }
-
-  end = strcspn(str, delim);
-
-  if (str[end] != '\0') 
-    {
-      str[end] = '\0';
-      *saveptr = str + end + 1;
-    } 
-  else 
-    {
-      *saveptr = 0;
-    }
-
-  return str;
+  for (; i < n; i++)
+  	{	
+  		c[k] = a[i];
+  		k++;
+  	}
+  for (; j < m; j++)
+  	{	
+  		c[k] = b[j];
+  		k++;
+  	}
 }
 
-  
+int dividing_array(double *a, int n, double x, int(*cmp)(double, double))
+{
+	int i = 0, j = n - 1;
+	while (i <= j)
+		{
+			while (i < n)
+				{
+					if ((*cmp)(a[i], x) >= 0) break;
+					i++;
+				} 
+			while (j >= 0)
+				{
+					if ((*cmp)(a[j], x) <= 0) break;
+					j--;
+				}
+			if (i <= j) 
+				{
+					if (i == j) return i;
+					swap(a + i, a + j);
+					i++;
+					j--;
+				}
+		}
+	return i;
+}
+
+void bubble_sort(double *a, int n, int(*cmp)(double, double))
+{
+	int i = 0, j = 0;
+	for (i = 0; i < n; i++) 
+		{
+		  for (j = 0; j < n - i - 1; j++) 
+			  {
+				  if ((*cmp)(a[j], a[j + 1]) > 0) 
+					  {
+						  swap(a + j, a + j + 1);
+					  }
+			  }
+	  }
+}
+
+void find_min_sort(double *a, int n, int(*cmp)(double, double))
+{
+	int i, k, ind_min;
+	double a_min;
+	for (k = n - 1; k >= 1; k--)
+		{
+			a_min = a[0];
+			ind_min = 0;
+			for (i = 1; i <= k; i++)
+				{
+					if ((*cmp)(a_min, a[i]) < 0) 
+						{	
+							a_min = a[i];
+							ind_min = i;
+						}
+				}
+			if (ind_min != k) swap(a + k, a + ind_min);
+		}
+}
+
+void linear_insert_sort(double *a, int n, int(*cmp)(double, double))
+{
+	int i, j;
+	double ins_el;
+  for (i = 1; i < n; i++) {
+    ins_el = a[i];
+    j = i - 1;
+    while (j >= 0 && (*cmp)(a[j], ins_el) > 0) {
+      a[j + 1] = a[j];
+      j --;
+    }
+    a[j + 1] = ins_el;
+  }
+}
+
+void binary_insert_sort(double *a, int n, int(*cmp)(double, double))
+{
+	int i, j, ind;
+	double ins_el;
+  for (i = 1; i < n; i++) {
+  	j = i - 1;
+    ins_el = a[i];
+    ind = binary_search(a, i, ins_el, *cmp);
+
+    while (j >= ind)
+    	{
+    		a[j + 1] = a[j];
+    		j--;
+    	}
+    a[ind] = ins_el;
+  }
+}
+
+void merge_sort(double *a, double *b, int n, int(*cmp)(double, double))
+{
+	double *c = a;
+	double *a_original = a;
+	int part_len, i;
+	for (part_len = 1; part_len < n; part_len *= 2) 
+	{
+		int last_len = n % (2 * part_len);
+	  for (i = 0; i <= n - 2 * part_len; i += 2 * part_len) 
+	    {
+	      merge_arrays(a + i, a + i + part_len, b + i, part_len, part_len, *cmp);
+	    }
+	  if (last_len > part_len) 
+	    {
+	      merge_arrays(a + i, a + i + part_len, b + i, part_len, n % part_len, *cmp);
+	  	}
+		else if (last_len > 0)
+			{
+				for (; i < n; i++)
+					{
+						b[i] = a[i];
+					}
+			}
+		c = a; 
+		a = b;
+		b = c;
+	}
+	if (a != a_original)
+		{
+			for (i = 0; i < n; i++)
+				{
+					a_original[i] = a[i];
+				}
+		}
+}
+
+void quick_sort(double *a, int n, int(*cmp)(double, double))
+{
+	int ind;
+	if (n <= 1) return;
+	while (n > 1)
+		{
+			ind = dividing_array(a, n, a[n / 2], *cmp);
+			if (ind == n) ind = n - 1;
+			if (ind == 0) ind = 1;
+			if (ind < n - ind)
+				{
+					quick_sort(a, ind, *cmp);
+					a = a + ind;
+					n -= ind;
+				}
+			else 
+				{
+					quick_sort(a + ind, n - ind, *cmp);
+					n = ind;
+				}
+		}
+}
+
+void tournament_sort(double *a, int n, int(*cmp)(double, double)) 
+{
+    int k, parent_index, left_index, right_index, index, largest, j;
+    double mid;
+    for (k = 1; k < n; k++) 
+    {
+      index = k;
+      mid = a[k];
+      while (index > 0) {
+          parent_index = (index - 1) / 2;
+          if ((*cmp)(mid, a[parent_index]) <= 0) break;
+          a[index] = a[parent_index];
+          index = parent_index;
+      }
+      a[index] = mid;
+    }
 
 
+    for (k = n - 1; k > 0; k--) {
+        swap(a + k, a + 0);
 
+        j = 0;
+        while (1) 
+        {
+          left_index = 2 * j + 1;
+          right_index = 2 * j + 2;
 
+          if (left_index >= k) break;
 
+          largest = j;
+          if (right_index < k && (*cmp)(a[left_index], a[right_index]) < 0) 
+          {
+            largest = right_index;
+          } 
+          else if (left_index < k) 
+          {
+            largest = left_index;
+          }
+          if ((*cmp)(a[j], a[largest]) >= 0) break;
 
-
-
+          swap(a + j, a + largest);
+          j = largest;
+        }
+    }
+}

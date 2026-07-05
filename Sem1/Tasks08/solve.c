@@ -10,24 +10,24 @@ void swap(double *a, double *b)
 	*b = c;
 }
 
-int diff_calculation(double *a, int n, int(*cmp)(double, double))
+int diff_calculation(double *a, int n)
 {
 	int i, cnt = 0;
 	for (i = 0; i < n - 1; i++)
 		{	
-			if ((*cmp)(a[i], a[i + 1]) > 0) cnt++;
+			if (a[i] > a[i + 1]) cnt++;
 		}
 	return cnt;
 }
 
-int binary_search(double *a, int n, double x, int(*cmp)(double, double))
+int binary_search(double *a, int n, double x)
 {
 	int left = 0, right = n;
 	int mid = 0;
 	while (left != right)
 		{	
 			mid = (left + right) / 2;
-			if ((*cmp)(a[mid], x) < 0)
+			if (a[mid] < x)
 				{	
 					left = mid + 1;
 				}
@@ -39,12 +39,12 @@ int binary_search(double *a, int n, double x, int(*cmp)(double, double))
 	return left;
 }
 
-void merge_arrays(double *a, double *b, double *c, int n, int m, int(*cmp)(double, double))
+void merge_arrays(double *a, double *b, double *c, int n, int m)
 {
 	int i = 0, j = 0, k = 0;
   while (i < n && j < m) 
   {
-    if ((*cmp)(a[i], b[j]) < 0)
+    if (a[i] < b[j])
     	{
     		c[k] = a[i];
     		k++;
@@ -70,19 +70,19 @@ void merge_arrays(double *a, double *b, double *c, int n, int m, int(*cmp)(doubl
   	}
 }
 
-int dividing_array(double *a, int n, double x, int(*cmp)(double, double))
+int dividing_array(double *a, int n, double x)
 {
 	int i = 0, j = n - 1;
 	while (i <= j)
 		{
 			while (i < n)
 				{
-					if ((*cmp)(a[i], x) >= 0) break;
+					if (a[i] >= x) break;
 					i++;
 				} 
 			while (j >= 0)
 				{
-					if ((*cmp)(a[j], x) <= 0) break;
+					if (a[j] <= x) break;
 					j--;
 				}
 			if (i <= j) 
@@ -96,14 +96,14 @@ int dividing_array(double *a, int n, double x, int(*cmp)(double, double))
 	return i;
 }
 
-void bubble_sort(double *a, int n, int(*cmp)(double, double))
+void bubble_sort(double *a, int n)
 {
 	int i = 0, j = 0;
 	for (i = 0; i < n; i++) 
 		{
 		  for (j = 0; j < n - i - 1; j++) 
 			  {
-				  if ((*cmp)(a[j], a[j + 1]) > 0) 
+				  if (a[j] > a[j + 1]) 
 					  {
 						  swap(a + j, a + j + 1);
 					  }
@@ -111,17 +111,17 @@ void bubble_sort(double *a, int n, int(*cmp)(double, double))
 	  }
 }
 
-void find_min_sort(double *a, int n, int(*cmp)(double, double))
+void find_min_sort(double *a, int n)
 {
 	int i, k, ind_min;
 	double a_min;
-	for (k = n - 1; k >= 1; k--)
+	for (k = n - 1; k > 1; k--)
 		{
 			a_min = a[0];
 			ind_min = 0;
 			for (i = 1; i <= k; i++)
 				{
-					if ((*cmp)(a_min, a[i]) < 0) 
+					if (a_min < a[i]) 
 						{	
 							a_min = a[i];
 							ind_min = i;
@@ -131,14 +131,14 @@ void find_min_sort(double *a, int n, int(*cmp)(double, double))
 		}
 }
 
-void linear_insert_sort(double *a, int n, int(*cmp)(double, double))
+void linear_insert_sort(double *a, int n)
 {
 	int i, j;
 	double ins_el;
   for (i = 1; i < n; i++) {
     ins_el = a[i];
     j = i - 1;
-    while (j >= 0 && (*cmp)(a[j], ins_el) > 0) {
+    while (j >= 0 && a[j] > ins_el) {
       a[j + 1] = a[j];
       j --;
     }
@@ -146,14 +146,14 @@ void linear_insert_sort(double *a, int n, int(*cmp)(double, double))
   }
 }
 
-void binary_insert_sort(double *a, int n, int(*cmp)(double, double))
+void binary_insert_sort(double *a, int n)
 {
 	int i, j, ind;
 	double ins_el;
   for (i = 1; i < n; i++) {
   	j = i - 1;
     ins_el = a[i];
-    ind = binary_search(a, i, ins_el, *cmp);
+    ind = binary_search(a, i, ins_el);
 
     while (j >= ind)
     	{
@@ -164,7 +164,7 @@ void binary_insert_sort(double *a, int n, int(*cmp)(double, double))
   }
 }
 
-void merge_sort(double *a, double *b, int n, int(*cmp)(double, double))
+void merge_sort(double *a, double *b, int n)
 {
 	double *c = a;
 	double *a_original = a;
@@ -174,11 +174,11 @@ void merge_sort(double *a, double *b, int n, int(*cmp)(double, double))
 		int last_len = n % (2 * part_len);
 	  for (i = 0; i <= n - 2 * part_len; i += 2 * part_len) 
 	    {
-	      merge_arrays(a + i, a + i + part_len, b + i, part_len, part_len, *cmp);
+	      merge_arrays(a + i, a + i + part_len, b + i, part_len, part_len);
 	    }
 	  if (last_len > part_len) 
 	    {
-	      merge_arrays(a + i, a + i + part_len, b + i, part_len, n % part_len, *cmp);
+	      merge_arrays(a + i, a + i + part_len, b + i, part_len, n % part_len);
 	  	}
 		else if (last_len > 0)
 			{
@@ -200,71 +200,58 @@ void merge_sort(double *a, double *b, int n, int(*cmp)(double, double))
 		}
 }
 
-void quick_sort(double *a, int n, int(*cmp)(double, double))
+void quick_sort(double *a, int n)
 {
 	int ind;
 	if (n <= 1) return;
 	while (n > 1)
 		{
-			ind = dividing_array(a, n, a[n / 2], *cmp);
+			ind = dividing_array(a, n, a[n / 2]);
 			if (ind == n) ind = n - 1;
 			if (ind == 0) ind = 1;
 			if (ind < n - ind)
 				{
-					quick_sort(a, ind, *cmp);
+					quick_sort(a, ind);
 					a = a + ind;
 					n -= ind;
 				}
 			else 
 				{
-					quick_sort(a + ind, n - ind, *cmp);
+					quick_sort(a + ind, n - ind);
 					n = ind;
 				}
 		}
 }
 
-void tournament_sort(double *a, int n, int(*cmp)(double, double)) 
+void tournament_sort(double *a, int n)
 {
-    int k, parent_index, left_index, right_index, index, largest, j;
-    double mid;
-    for (k = 1; k < n; k++) 
-    {
-      index = k;
-      mid = a[k];
-      while (index > 0) {
-          parent_index = (index - 1) / 2;
-          if ((*cmp)(mid, a[parent_index]) <= 0) break;
-          a[index] = a[parent_index];
-          index = parent_index;
-      }
-      a[index] = mid;
-    }
-
-
-    for (k = n - 1; k > 0; k--) {
-        swap(a + k, a + 0);
-
-        j = 0;
-        while (1) 
-        {
-          left_index = 2 * j + 1;
-          right_index = 2 * j + 2;
-
-          if (left_index >= k) break;
-
-          largest = j;
-          if (right_index < k && (*cmp)(a[left_index], a[right_index]) < 0) 
-          {
-            largest = right_index;
-          } 
-          else if (left_index < k) 
-          {
-            largest = left_index;
-          }
-          if ((*cmp)(a[j], a[largest]) >= 0) break;
-
-          swap(a + j, a + largest);
-          j = largest;
-        }
-    }
+	int j, ind;
+	int i, i1, i2;
+	for (ind = 1; ind < n; ind++)
+		{
+			while (ind > 0)
+				{
+					j = (ind - 1) / 2;
+					if (a[ind] > a[j]) swap(a + ind, a + j);
+					else break;
+					ind = j;
+				}
+		}
+	for (ind = ind - 1; ind > 0; ind--)
+		{
+			swap(a, a + ind);
+			for (i = 0; i < ind;)
+				{
+					i1 = 2 * i + 1;
+					i2 = 2 * i + 2;
+					if (i1 >= ind) break;
+					if (i2 < ind && a[i1] < a[i2]) i1 = i2;
+					if (a[i] < a[i1])
+						{
+							swap(a + i, a + i1);
+							i = i1;
+						}
+					else break;
+				}
+		}
 }

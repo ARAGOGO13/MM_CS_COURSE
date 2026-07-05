@@ -1,86 +1,124 @@
 #include <stdio.h>
-#include "io_status.h"
-#include "print_bits.h"
+#include "task.h"
 
-int max_zeros_sequence(const char*, int*, int*);
+int type_of_sequence(const char*);
 
-int max_zeros_sequence(const char* filename, int* i, int* j) {
+int type_of_sequence(const char *file_name)
+{
+	FILE *f;	
+	double cur;
+	double previous3, previous2, previous1;
+	double d1, d2, q1 = 1, q2 = 1;
+	int e1, e2;
+	int status = 0;
+	f = fopen(file_name, "r");
 
-  int count = -1;
-  int cnt_of_zeros = 0;
-  int x;
-  int first_zeros = -1;
-  int last_zeros = -1;
-  int bit_index, bit;
-  int flag = 0;
+	if (!f) return ERROR_OPEN;
 
-
-  FILE* fp = fopen(filename, "r");
-  if (!fp) return ERROR_OPEN; 
-
-
-
-  while (fscanf(fp, "%d", &x) == 1)
+	if (fscanf(f, "%lf", &previous3) != 1) 
 		{
-      for (bit_index = sizeof(int) * 8 - 1; bit_index >= 0; --bit_index) 
-      	{
-      		count ++;
-          bit = (x >> bit_index) & 1;
-          if (!bit)
-          	{
-          		if (flag == 0) 
-          			{
-          				if (first_zeros == -1) first_zeros = count;
-          				last_zeros = count;
-          				cnt_of_zeros ++;
-          			}
-          		flag = 1;
-          	}
-          if (bit) 
-          	{
-          		flag = 0;
-          	}
-        }
+			if (feof(f)) 
+				{
+					fclose(f);
+					return 4;
+				}
+			fclose(f);
+			return ERROR_READ;
 		}
 
-  if (!feof(fp)) 
-	  {
-	    fclose(fp);
-	    return ERROR_READ;
-	  }
+	if (fscanf(f, "%lf", &previous2) != 1) 
+		{
+			if (feof(f)) 
+				{
+					fclose(f);
+					return 4;
+				}
+			fclose(f);
+			return ERROR_READ;
+		}
 
-  fclose(fp);
+	if (fscanf(f, "%lf", &previous1) != 1) 
+		{
+			if (feof(f)) 
+				{
+					fclose(f);
+					if (previous2 <= previous3 && previous2 >= previous3)	return 3;
+					if ((previous2 <= 0 && previous2 >= 0) || (previous3 <= 0 && previous3 >= 0)) return 1;
+					return 4;
+				}
+			fclose(f);
+			return ERROR_READ;
+		}
 
-  if (count == -1)
-  	{	
-  		first_zeros = -1;
-  		last_zeros = -1;
-  	}
 
-  *i = first_zeros;
-  *j = last_zeros;
+	d1 = previous2 - previous3;
+	d2 = previous1 - previous2;
 
-  return cnt_of_zeros;
-}
+	if (!(previous2 <= 0 && previous2 >= 0) && !(previous3 <= 0 && previous3 >= 0))
+		{	
+			q1 = previous2 / previous3;
+			q2 = previous1 / previous2;
+		}
+
+
+	e1 = previous2 <= previous3 && previous2 >= previous3;
+	e2 = previous2 <= previous1 && previous2 >= previous1;
+
+	if (d1 <= d2 && d1 >= d2 && !(d1 <= 0 && d1 >= 0)) status = 1;
+	if (q1 <= q2 && q1 >= q2 && !(q1 <= 1 && q1 >= 1)) status = 2;
+	if (e1 == e2 && e1 == 1) status = 3;
+
+	while (fscanf(f, "%lf", &cur) == 1)
+		{	
+			d1 = previous1 - previous2;
+			d2 = cur - previous1;
+
+			if (!(previous2 <= 0 && previous2 >= 0) && !(previous1 <= 0 && previous1 >= 0))
+				{
+					q1 = previous1 / previous2;
+					q2 = cur / previous1;
+				}
+
+			e1 = previous1 <= previous2 && previous1 >= previous2;
+			e2 = previous1 <= cur && previous1 >= cur;
+
+			if ((!(d1 <= d2 && d1 >= d2) && !(d1 <= 0 && d1 >= 0) && status == 1) || 
+				  (!(q1 <= q2 && q1 >= q2) && !(q1 <= 1 && q1 >= 1) && status == 2) ||
+				  (!(e1 == e2) && e1 == 1 && status == 3))
+				{
+					fclose(f);
+					return 0;
+				}
+			previous2 = previous1;
+			previous1 = cur;
+		}
+
+	if (!feof(f)) 
+		{	
+			fclose(f);
+			return ERROR_READ;
+		}
+
+	fclose(f);
+	return status;
+} 
+
+
 
 int main(int argc, char* argv[]) 
 {
+	int res;
 	char *file_name;
-	int res, i = -1, j = -1;
 	if (argc != 2)
 		{	
 			printf("Can not read from %s \n", argv[0]);
 			return 1;
 		}
-
 	file_name = argv[1];
-
-	print_bits0(argv[1]);
-	res = max_zeros_sequence(file_name, &i, &j);
-
+	res = type_of_sequence(file_name);
 	if (res >= 0) 
 		{ 
-    	printf("%s : Task = %d Result = %d i = %d j = %d \n", argv[0], 8, res, i, j);
+    	printf("%s : Task = %d Result = %d\n", argv[0], 8, res);
     } 
   else 
    	{
@@ -91,6 +129,9 @@ int main(int argc, char* argv[])
 	          break;
 	        case ERROR_READ:
 	          printf("Error: Invalid character in the file %s \n", file_name);
+	          break;
+	        case EMPTY_FILE:
+	          printf("Error: File %s is empty \n", file_name);
 	          break;
 	        default:
 	          printf("Unknown error\n");

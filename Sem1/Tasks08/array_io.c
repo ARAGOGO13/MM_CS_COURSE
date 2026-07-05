@@ -69,17 +69,3 @@ void print_array(const double *a, int n, int p)
 			printf("%e\n", a[i]);
 		}
 }
-
-int compare1(double x, double y)
-{
-	if (x < y) return -1;
-	if (x > y) return 1;
-	return 0;
-}
-
-int compare2(double x, double y)
-{
-	if (x < y) return 1;
-	if (x > y) return -1;
-	return 0;
-}

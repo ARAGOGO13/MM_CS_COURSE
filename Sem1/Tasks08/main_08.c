@@ -1,21 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 #include "array_io.c"
 #include "array_io.h"
 #include "solve.h"
 
 int main(int argc, char *argv[])
 {
-	int n, p, s, diff, c;
+	int n, p, s, diff;
 	char *file_name = 0;
 	double *a, *b;
 	double t;
-	int (*cmp_func)(double, double);
 	int res;
-	if (!((argc == 5 || argc == 6) && sscanf(argv[1], "%d", &c) == 1 && sscanf(argv[2], "%d", &n) == 1 && sscanf(argv[3], "%d", &p) == 1 && sscanf(argv[4], "%d", &s) == 1))
+	if (!((argc == 4 || argc == 5) && sscanf(argv[1], "%d", &n) == 1 && sscanf(argv[2], "%d", &p) == 1 && sscanf(argv[3], "%d", &s) == 1))
 		{	
-			printf("Usage: %s c n p s [file] \n", argv[0]);
+			printf("Usage: %s n p s [file] \n", argv[0]);
 			return 1;
 		}
 
@@ -25,13 +25,13 @@ int main(int argc, char *argv[])
 			return 2;
 		}
 
-	if ((s == 0 && argc != 6) || (s != 0 && argc == 6))
+	if ((s == 0 && argc != 5) || (s != 0 && argc == 5))
 		{
 			printf("Need to set s = 0 or add file_name \n");
 			return 4;
 		}
 
-	if (argc == 6) file_name = argv[5];
+	if (argc == 5) file_name = argv[4];
 	a = (double*)malloc(n * sizeof(double));
 	if (!a)
 		{
@@ -73,23 +73,17 @@ int main(int argc, char *argv[])
 			printf("Not enough memory! \n");
 			return 3;
 		}
+
 	print_array(a, n, p);
-
-	if (c == 1) cmp_func = compare1;
-	else if (c == 2) cmp_func = compare2;
-	else
-		{	
-			printf("Invalid value for c. Must be 1 or 2 \n");
-			return 1;
-		}
-
 	t = clock();
-	merge_sort(a, b, n, cmp_func);
+	merge_sort(a, b, n);
 	t = (clock() - t) / CLOCKS_PER_SEC;
-	diff = diff_calculation(a, n, cmp_func);
-	printf("New array:\n");
+
+	printf("New array: \n");
 	print_array(a, n, p);
+	diff = diff_calculation(a, n);
 	printf("%s : Task = %d Diff = %d Elapsed = %.2f\n", argv[0], 8, diff, t);
 	free(a);
+	free(b);
 	return 0;
 }
